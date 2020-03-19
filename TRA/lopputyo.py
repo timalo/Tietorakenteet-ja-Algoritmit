@@ -8,13 +8,11 @@ lähtökaupunki, maalikaupunki, tien korkeus(hinta)
 Viimeisellä rivillä on kaupunki, johon reittiä etsitään.
 """
 
-
 def kysy_data(): 
 	"""Kysyy käyttäjältä tiedoston, josta data luetaan"""
 	while True:
 		datatiedosto = str(input("Give the text file for reading data (With the .txt extension!): "))
 		return datatiedosto
-
 
 def kasittele_data(tiedosto):
 	"""Opens the data file, reads it and saves the data in an array and variables. After done, closes the data file"""
@@ -32,7 +30,6 @@ def kasittele_data(tiedosto):
 	goal_node = int(f.readline())      #Verkon data ja päätepiste talteen
 	f.close()
 	return data_array, node_amount, road_amount, goal_node
-
 
 def isCyclic(graph, newEdge):
 	"""
@@ -110,6 +107,9 @@ def Kruskal(data_array, nodeAmount):
 	return minimumTree
 
 def getAdjacents(arrangedMST, node_amount):
+	"""
+	Returns a list of adjacent nodes for every node.
+	"""
 	adjacents = []
 	for i in range(node_amount):
 		adjacents.append([])
@@ -118,12 +118,10 @@ def getAdjacents(arrangedMST, node_amount):
 		endnode = arrangedMST[i][1]
 		adjacents[int(startnode)-1].append(int(endnode))
 		adjacents[int(endnode)-1].append(int(startnode))
-	#print(adjacents)
 	return adjacents
 
-
 def highestPath(path, MST):
-	"""Takes the final path and the original MST with the path weight info.
+	"""Takes the final path and the original MST array with the path weight info.
 	Then finds the highest connection on the path.
 	"""
 	highest = 0
@@ -131,11 +129,10 @@ def highestPath(path, MST):
 		start = path[i]
 		end = path[i + 1]
 		for j in MST:													#Find the path weights from the MST array, time complexity for this could probably be way lower
-			if start == int(j[0]) and end == int(j[1]) or start == int(j[1]) and end == int(j[0]):	
+			if start == int(j[0]) and end == int(j[1]) or start == int(j[1]) and end == int(j[0]):
 				if int(j[2]) > highest:
 					highest = int(j[2])
 	return highest
-	#THIS SHOULD WORK NOW
 
 def DFS (MST, node_amount, goalNode):
 	"""
@@ -145,39 +142,20 @@ def DFS (MST, node_amount, goalNode):
 	try:
 		arrangedByStartNode = sorted(MST,key=lambda MST: int(MST[0]))	#Arrange MST by start node	
 		adjacents = getAdjacents(arrangedByStartNode, node_amount)		#get adjacent nodes for every node as an array f. ex. adjacents 1 and 3 for node 2 would be shown as [[2][1,3][2]]
-		print(MST)
 		for i in adjacents:
 			i.sort()													#sorting the adjacents in ascending order, so that we will later visit the largest number node first
 		curr = 1														#current node
 		currPath = [1]													#list of nodes traversed, the end result path will be stored here, always has the node 1 in the beginning
 		pred = [0] * node_amount										#previous node, where we got to the current node from. Every index will contain the predecessor for the node. pred[0] will always be 0
-		visited = [0] * node_amount										#Initiate a list for nodes visited (in the start every node not visited)
-		visited[0] = 1													#Start by marking the start node as visited
 		pred[0] = "alku"												#Special predecessor for the start node
-
-		#IN THE VISITED LIST THE NUMBERS ARE AS FOLLOWS:
-		# 0 = NOT VISITED
-		# 1 = VISITED BUT NOT ALL ADJACENT NODES VISITED
-		# 2 = NODE AND ALL ADJACENT NODES (except pred) ARE VISITED
 
 		while curr != goalNode:
 			if curr not in currPath:
 				currPath.append(curr)	
-				visited[curr-1] = 1
 			currAdjacents = adjacents[curr-1]							#Get the adj. nodes for the current node
-			print("currAdjacents: " + str(currAdjacents))
-			if pred[curr-1] != "alku" and currAdjacents:
+			
+			if pred[curr-1] in currAdjacents:
 				currAdjacents.remove(pred[curr-1])							#Remove the predecessor from the list of adjacents
-
-			print(" ")
-			print("Predecessors are: " + str(pred))
-			print("Visit States: " + str(visited))
-			print("Current node is: " + str(curr))
-			print("Visit state is: " + str(visited[curr-1]))
-			print("current adjacent unvisited nodes are: " + str(currAdjacents))
-			print("Current path is: " + str(currPath))
-			print("JUMPING")
-			print(" ")
 
 			if currAdjacents:	#Jumps to the next node, deletes it from list of adjacents in previous node and assings the previous node as the predecessor for the next one.
 				prev = curr
@@ -187,20 +165,18 @@ def DFS (MST, node_amount, goalNode):
 				curr = pred[curr-1]
 				del currPath[-1]
 
-
 	except IndexError:
-		print("error")
+		print("error :(")
 		return 0
 		
 	currPath.append(goalNode)
 	print("Final path is: " + str(currPath))
 	print("Final Node " + str(goalNode) + " found")
 
-
-
 	highestPoint = highestPath(currPath, MST)
 	print("Highest point on the path is: " + str(highestPoint))
 	return 0
+
 def main():
 	while True:
 		try:
@@ -220,59 +196,3 @@ def main():
 
 main()
 
-
-
-
-
-
-
-
-"""while curr != goalNode:											#Go through nodes until the goal node is found
-	if curr not in currPath:
-		currPath.append(curr)									#add the current node to the final path if it's not in the list already (if we have backed from a dead end)
-	currAdjacents = adjacents[curr-1]							#Get the adj. nodes for the current node
-	print(visited)
-	print("Current node is: " + str(curr))
-	print("Visit state is: " + str(visited[curr-1]))
-	print("current adjacent unvisited nodes are: " + str(currAdjacents))
-	print("Current path is: " + str(currPath))
-	print("JUMPING")
-	if currAdjacents[-1] == currAdjacents[0] == pred:			#if a dead end is found, delete the current node and abandon it
-		visited[curr - 1] = 2									#Mark the dead end node as completely explored
-		curr = pred												#back up to the previous node
-		del currPath[-1]										#delete the dead end node from the path
-
-	else:
-		pred = curr												#jump to the next node by making the current node the previous one
-		curr = currAdjacents.pop()								#take the last index from the adjacents and jump to it
-		visited[curr-1] = 1										#mark the node as visited
-endPath = list(dict.fromkeys(currPath))
-endPath.append(goalNode)
-print("Final path is: " + str(endPath))
-if visited[-1] == True:
-	print("End node " + str(goalNode) +  " found")
-"""
-
-
-
-
-
-
-
-
-
-
-			
-			
-"""if currAdjacents:			#Prevent IndexError because we can't check for indices from an empty list
-	if currAdjacents[-1] == currAdjacents[0] == pred[curr-1]:
-		visited[curr-1] = 2
-		curr = pred[curr-1]
-		del currPath[-1]
-elif currAdjacents:
-
-	prev = curr
-	curr = currAdjacents.pop()
-	pred[curr-1] = prev
-
-	visited[curr-1] = 1"""
