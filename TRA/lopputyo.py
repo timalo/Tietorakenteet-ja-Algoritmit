@@ -1,15 +1,15 @@
 import time
 
 """
-Tekstitiedostossa tieverkko:
-Ensimmäisellä rivillä kaupunkien lkm. ja teiden lkm.
-Sen jälkeen omalla rivillään tiet lukukolmikkona:
-lähtökaupunki, maalikaupunki, tien korkeus(hinta)
-Viimeisellä rivillä on kaupunki, johon reittiä etsitään.
+Text file with the graph is given.
+First row has the amount of nodes and the amount of connections
+After that each line contains values:
+starting node, ending node, weight of the connection
+On the last row is the goal node, that we're finding the path to.
 """
 
 def kysy_data(): 
-	"""Kysyy käyttäjältä tiedoston, josta data luetaan"""
+	"""Asks the user for the text file where the data will be read"""
 	while True:
 		datatiedosto = str(input("Give the text file for reading data (With the .txt extension!): "))
 		return datatiedosto
@@ -20,14 +20,14 @@ def kasittele_data(tiedosto):
 	print(" ")
 	print("Reading data...")
 	print(" ")
-	data_array = [] #Alustus taulukolle, johon tallennetaan kaupunkien väliset tiet ja niiden korkeudet
+	data_array = [] #Initialization for an array for roads and their weights
 	textrow_1 = f.readline().split()
 	node_amount = int(textrow_1[0])
-	road_amount = int(textrow_1[1])   #Ottaa datasta talteen solmujen(kaupunkien) ja teiden lukumäärän
+	road_amount = int(textrow_1[1])   #Reads and saves the node and road amounts
 	for i in range(int(road_amount)):
 		data_row = f.readline().split()
 		data_array.append(data_row)
-	goal_node = int(f.readline())      #Verkon data ja päätepiste talteen
+	goal_node = int(f.readline())
 	f.close()
 	return data_array, node_amount, road_amount, goal_node
 
@@ -191,7 +191,7 @@ def main():
 			break
 		except FileNotFoundError:
 			print("")
-			print("No such file found! Enter a file that exists in the same directory as main.py!")
+			print("No such file found! Enter a file that exists in the same directory as lopputyo.py!")
 			print("")
 
 main()
